@@ -1,0 +1,184 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop_shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of_type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+.image-container {
+  /* This part is already in your inline style and is fine */
+  /* width: 100%; */
+  height: 300px; /* You must define a fixed height for the container */
+  position: relative; /* Useful for absolute positioning later if needed */
+  overflow: hidden; /* Ensures the image is clipped if it overflows */
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1;
+  color: rgba(222, 139, 72, 0.932);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+h2 {
+  font-size: 2em;
+  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.749);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+h3 {
+  font-size: 2em;
+  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.605);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+p {
+  font-size: 1.2em;
+  line-height: 0.8;
+  color: rgba(255, 255, 255, 0.605);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+button {
+  background-color: #4f594881;
+  border: 1px solid #755b12;
+  padding: 0px 15px;
+  font-size: 1.5em;
+  color: white;
+  cursor: pointer;
+  border-radius: 55px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #9374374c;
+  border-color: #f2a128;
+  scale: 1.05;
+}
+
+button:focus {
+  outline: none;
+}
+
+li {
+  font-size: 1.2em;
+  line-height: 1.5;
+  color: rgb(255, 255, 255);
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+li::before {
+  /* Unicode for a bullet point */
+  color: #0c0c0f; /* Color of the bullet point */
+}
+
+li:hover {
+  color: #d55f24; /* Color of the text on hover */
+}
+li:focus {
+  outline: none;
+  color: #d55f24; /* Color of the text on focus */
+}
+
+li a {
+  color: inherit; /* Inherit color from parent li */
+  text-decoration: none;
+}
+
+li a:visited {
+  color: inherit; /* Keep the same color for visited links */
+}
+
+li a:hover {
+  color: inherit; /* Inherit the hover color from parent li */
+}
+
+.map-button {
+  background-color: #4f594881;
+  border: none;
+  padding: 10px 10px;
+  font-size: 0.75em;
+  color: rgba(255, 255, 255, 0.711);
+  cursor: pointer;
+  border-radius: 55px;
+  transition: background-color 0.3s ease;
+  margin: 0px;
+  border: 1px solid #755b12;
+  border-color: #836d2d;
+  width: 115px;
+  height: 80px;
+}
+
+.map-button:active {
+  background-color: #d55f24;
+}
+.map-button:hover {
+  background-color: #9374374c;
+  border-color: #d55f24;
+}
+.map-button:focus {
+  outline: none;
+}
+
+.button-icon {
+  width: 50px;
+  height: auto;
+  margin-left: 0px;
+  vertical-align: middle;
+}
+
+.active-button {
+  background-color: #b98f3a89;
+  border-color: #f2a128;
+  scale: 1.1;
+
+  transform: background-color 0.3s ease, scale 0.1s ease;
+}

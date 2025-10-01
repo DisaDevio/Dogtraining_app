@@ -1,0 +1,96 @@
+.learning-curve-container {
+  width: 90%;
+  margin: auto;
+  min-height: 500px;
+  background-color: rgba(255, 255, 255, 0);
+
+  border-radius: 30px;
+  font-size: small;
+  position: relative;
+}
+
+.learning-curve-container h1 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.learning-curve-container ul {
+  list-style: none;
+  padding: 0;
+  min-width: 335px;
+}
+
+.learning-curve-container li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  background-color: rgba(38, 50, 23, 0.199);
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.learning-curve-container li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.learning-curve-container li span {
+  flex-grow: 1;
+  color: white;
+  align-items: start;
+  display: flex;
+}
+
+.learning-curve-container label {
+  color: white;
+  margin-left: 15px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.learning-curve-container input[type="checkbox"] {
+  /* Hide the native checkbox */
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.learning-curve-container input[type="checkbox"] + span {
+  position: relative;
+  display: inline-block;
+  width: 20px; /* Custom checkbox width */
+  height: 20px; /* Custom checkbox height */
+  margin-right: 8px;
+  border: 2px solid #ccc; /* Border for the custom checkbox */
+  border-radius: 4px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.learning-curve-container input[type="checkbox"]:checked + span {
+  background-color: #d27926; /* Background when checked */
+  border-color: #d27926;
+}
+
+.learning-curve-container input[type="checkbox"]:checked + span::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.learning-curve-container input[type="checkbox"]:focus {
+  outline: 2px solid #f2aa4c;
+  outline-offset: 2px;
+}
+.learning-curve-container input[type="checkbox"]:hover {
+  box-shadow: 0 0 5px #f2aa4c;
+}
+.learning-curve-container input[type="checkbox"]:checked {
+  background-color: #f2aa4c;
+  border-color: #f2aa4c;
+}
