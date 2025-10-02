@@ -1,17 +1,97 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Activities from "./components/Activities";
 import MapComponent from "./components/Map";
+import ActivityDetails from "./components/ActivityDetails";
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch("/api/check_login");
+        const data = await response.json();
+        setLoggedIn(data.logged_in);
+      } catch (error) {
+        console.error("Error checking login status:", error);
+      }
+      setLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        setLoggedIn(true);
+      } else {
+        const data = await response.json();
+        setError(data.error || "Login failed");
+      }
+    } catch (error) {
+      setError("An error occurred during login.");
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Router>
       <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/jaktdagbok/*" element={<Activities />} />
-          <Route path="/map" element={<MapComponent />} />
-        </Routes>
+        {loggedIn ? (
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/jaktdagbok/*" element={<Activities />} />
+            <Route path="/map" element={<MapComponent />} />
+            <Route path="/activity/:id" element={<ActivityDetails />} />
+          </Routes>
+        ) : (
+          <div className="login-container">
+            <form onSubmit={handleLogin} className="login-form">
+              <h2>Login to Garmin Connect</h2>
+              {error && <p className="error">{error}</p>}
+              <div>
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label>Password:</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit">Login</button>
+            </form>
+          </div>
+        )}
       </div>
     </Router>
   );

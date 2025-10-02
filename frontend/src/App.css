@@ -182,3 +182,69 @@ li a:hover {
 
   transform: background-color 0.3s ease, scale 0.1s ease;
 }
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  width: 100%;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  border: 2 px solid rgba(67, 70, 46, 0.9);
+  justify-content: space-between;
+  align-items: stretch;
+  border-radius: 8px;
+  background-color: rgba(87, 91, 58, 0.9);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.151);
+  width: 60%;
+}
+
+.login-form input {
+  padding: 0.5rem;
+  border: 1px solid #ed9614;
+  border-radius: 4px;
+  background-color: #565c24e5;
+  color: white;
+  align-self: flex-end;
+}
+
+.login-form button {
+  padding: 0.5rem;
+  border: 1px solid #ff8800;
+  border-radius: 4px;
+  background-color: #ff7b006f;
+  transition: transform 0.3s ease;
+  color: white;
+
+  cursor: pointer;
+}
+.login-form button:hover {
+  background-color: rgba(222, 139, 72, 0.932);
+  transform: scale(1.01);
+}
+.login-form label {
+  color: white;
+  font-size: 1rem;
+  padding: 1rem;
+}
+.login-form label input {
+  color: white;
+  background-color: #565c2435;
+  font-size: 1rem;
+  padding: 1rem;
+}
+.login-form .error {
+  color: red;
+  margin-bottom: 1rem;
+}
