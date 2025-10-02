@@ -13,6 +13,8 @@ This application allows you to connect to your Garmin account and view your acti
   nvm use 20
   ```
 
+- **Garmin Connect credentials:** To be able to view details about your activities, a garmin connect account is required.
+
 ## How to run the application
 
 This application consists of a React frontend and a Flask backend.
