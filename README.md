@@ -33,14 +33,7 @@ This application consists of a React frontend and a Flask backend.
     pip install -r requirements.txt
     ```
 
-3.  **Set your Garmin credentials as environment variables.** This is to keep your credentials secure.
-
-    ```bash
-    export EMAIL="your_garmin_email"
-    export PASSWORD="your_garmin_password"
-    ```
-
-4.  **Run the backend server:**
+3.  **Run the backend server:**
 
     ```bash
     python main.py
