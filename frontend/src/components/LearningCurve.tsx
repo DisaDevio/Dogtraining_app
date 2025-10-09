@@ -251,7 +251,7 @@ const LearningCurve: React.FC = () => {
   return (
     <div className="learning-curve-container" style={{ position: "relative" }}>
       <img
-        src="/hertha-husse-2.jpg"
+        src="/hertha-husse-2.png"
         alt="Background"
         className="background-image"
         style={{
