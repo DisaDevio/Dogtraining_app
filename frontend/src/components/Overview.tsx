@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../../public/hertha_husse.jpg";
 
 interface Activity {
   distance: number;
@@ -56,7 +55,7 @@ const Overview = () => {
         </p>
       </div>
       <img
-        src="../../public/hertha_husse.jpg"
+        src="/hertha_husse.png"
         alt="Hertha running"
         style={{
           marginTop: "20px",
