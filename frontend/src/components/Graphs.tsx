@@ -70,7 +70,7 @@ const Graphs = () => {
 
   return (
     <div>
-      <h2 style={{ color: "white", marginBottom: "20px" }}>Diagram</h2>
+      <h2 style={{ color: "white", marginBottom: "20px" }}>Statistik</h2>
       <div
         style={{
           width: "90%",
