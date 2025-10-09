@@ -5,13 +5,14 @@ Simple Garmin Connect API Example
 
 import logging
 import os
+import json
 import sys
 from datetime import date
 from getpass import getpass
 from pathlib import Path
 
 import requests
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 from garth.exc import GarthException, GarthHTTPError
 
 from garminconnect import (
@@ -27,139 +28,215 @@ app = Flask(__name__, static_folder="../frontend/dist")
 logging.getLogger("garminconnect").setLevel(logging.CRITICAL)
 
 
-def get_credentials():
-    """Get email and password from environment or user input."""
-    email = os.getenv("EMAIL")
-    password = os.getenv("PASSWORD")
-
-    if not email or not password:
-        print("Please set EMAIL and PASSWORD environment variables.")
-        sys.exit(1)
-
-    return email, password
-
-
 def init_api() -> Garmin | None:
     """Initialize Garmin API with authentication and token management."""
-    # Configure token storage
-    tokenstore = os.getenv("GARMINTOKENS", "~/.garminconnect")
-    tokenstore_path = Path(tokenstore).expanduser()
-    print(f"Token storage: {tokenstore_path}")
-
-    # Check if token files exist
-    if tokenstore_path.exists():
-        print("Found existing token directory")
-        token_files = list(tokenstore_path.glob("*.json"))
-        if token_files:
-            print(
-                f"Found {len(token_files)} token file(s): {[f.name for f in token_files]}"
-            )
-        else:
-            print("Token directory exists but no token files found")
-    else:
-        print("No existing token directory found")
-
-    # First try to login with stored tokens
     try:
-        print("Attempting to use saved authentication tokens...")
         garmin = Garmin()
+        tokenstore = os.getenv("GARMINTOKENS", "~/.garminconnect")
+        tokenstore_path = Path(tokenstore).expanduser()
         garmin.login(str(tokenstore_path))
-        print("Successfully logged in using saved tokens!")
         return garmin
-    except (
-        FileNotFoundError,
-        GarthHTTPError,
-        GarminConnectAuthenticationError,
-        GarminConnectConnectionError,
-    ):
-        print("No valid tokens found. Requesting fresh login credentials.")
+    except (FileNotFoundError, GarthHTTPError, GarminConnectAuthenticationError):
+        return None
 
-    # Loop for credential entry with retry on auth failure
-    while True:
-        try:
-            # Get credentials
-            email, password = get_credentials()
-            print(" Logging in with credentials...")
-            garmin = Garmin(
-                email=email, password=password, is_cn=False, return_on_mfa=True
-            )
-            result1, result2 = garmin.login()
-            if result2 is None:
-                print("Login successful!")
-                # Save tokens for future use
-                garmin.garth.dump(str(tokenstore_path))
-                print(f"Authentication tokens saved to: {tokenstore_path}")
-                return garmin
 
-            if result1 == "needs_mfa":
-                print("Multi-factor authentication required")
-                mfa_code = input("Please enter your MFA code: ")
-                print("Submitting MFA code...")
-                try:
-                    garmin.resume_login(result2, mfa_code) # type: ignore
-                    print("MFA authentication successful!")
-                except GarthHTTPError as garth_error:
-                    # Handle specific HTTP errors from MFA
-                    error_str = str(garth_error)
-                    if "429" in error_str and "Too Many Requests" in error_str:
-                        print("Too many MFA attempts")
-                        print("Please wait 30 minutes before trying again")
-                        sys.exit(1)
-                    elif "401" in error_str or "403" in error_str:
-                        print("Invalid MFA code")
-                        print("Please verify your MFA code and try again")
-                        continue
-                    else:
-                        # Other HTTP errors - don't retry
-                        print(f"MFA authentication failed: {garth_error}")
-                        sys.exit(1)
-                except GarthException as garth_error:
-                    print(f"MFA authentication failed: {garth_error}")
-                    print("Please verify your MFA code and try again")
-                    continue
+@app.route("/api/login", methods=["POST"])
+def login():
+    """Login to Garmin Connect."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON payload"}), 400
 
-            # Save tokens for future use
-            garmin.garth.dump(str(tokenstore_path))
-            print(f"Authentication tokens saved to: {tokenstore_path}")
-            print("Login successful!")
-            return garmin
-        except GarminConnectAuthenticationError:
-            print("Authentication failed:")
-            print("Please check your username and password and try again")
-            # Continue the loop to retry
-            continue
-        except (
-            FileNotFoundError,
-            GarthHTTPError,
-            GarminConnectConnectionError,
-            requests.exceptions.HTTPError,
-        ) as err:
-            print(f"Connection error: {err}")
-            print("Please check your internet connection and try again")
-            return None
-        except KeyboardInterrupt:
-            print("\nCancelled by user")
-            return None
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    try:
+        garmin = Garmin(email, password)
+        garmin.login()
+        tokenstore = os.getenv("GARMINTOKENS", "~/.garminconnect")
+        tokenstore_path = Path(tokenstore).expanduser()
+        garmin.garth.dump(str(tokenstore_path))
+        return jsonify({"message": "Login successful"})
+    except (GarminConnectConnectionError, GarthHTTPError) as e:
+        return jsonify({"error": str(e)}), 500
+    except GarminConnectAuthenticationError as e:
+        return jsonify({"error": str(e)}), 401
+
+
+@app.route("/api/check_login")
+def check_login():
+    """Check if user is logged in."""
+    if init_api():
+        return jsonify({"logged_in": True})
+    else:
+        return jsonify({"logged_in": False})
+
 
 @app.route("/api/activities")
 def get_activities():
     api = init_api()
     if not api:
-        return jsonify({"error": "Failed to initialize API"}), 500
+        return jsonify({"error": "Not logged in"}), 401
+    activities = api.get_activities(0, 1000)  # first 100
+    hunting_activities = [
+        a for a in activities
+        if isinstance(a, dict) and a.get("activityType", {}).get("typeKey", "").lower() in ["hunting", "running", "hiking"]
+    ]
 
-    activity_type = "running"
+    return jsonify(hunting_activities)
 
-    start_date = "2000-01-01"
-    end_date = date.today().isoformat()
-    activities = api.get_activities_by_date(
-        start_date, end_date, activity_type
-    )
+@app.route("/api/activity/<activity_id>/route")
+def get_activity_route(activity_id):
+    api = init_api()
+    if not api:
+        return jsonify({"error": "Not logged in"}), 401
 
-    return jsonify(activities)
+    details = api.get_activity_details(activity_id)
+    gps_points = details.get("geoPolylineDTO", {}).get("polyline", [])
+    line = [[p['lat'], p['lon']] for p in gps_points]
+    return jsonify(line)
+
+@app.route("/api/activity/<activity_id>/stats")
+def get_activity_stats(activity_id):
+    api = init_api()
+    if not api:
+        return jsonify({"error": "Not logged in"}), 401
+
+    try:
+        activity = api.get_activity(activity_id)
+        
+        stats = {
+            "Namn": activity.get("activityName"),
+            "Tid": activity['summaryDTO'].get("startTimeLocal").split("T")[0]+" "+activity['summaryDTO'].get("startTimeLocal").split("T")[1].split(".")[0],
+            "Varaktighet": activity['summaryDTO'].get("duration"),
+            "Distans (m)": activity['summaryDTO'].get("distance"),
+            "Höjdmeter upp/ned (m)": str(activity['summaryDTO'].get("elevationGain")) + " / " + str(activity['summaryDTO'].get("elevationLoss")),
+        }
+
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/activity/<activity_id>/weather")
+def get_activity_weather(activity_id):
+    api = init_api()
+    if not api:
+        return jsonify({"error": "Not logged in"}), 401
+
+    try:
+        activity = api.get_activity(activity_id)
+        weather = activity.get("weather") or activity.get("weatherConditions")
+
+        if not weather:
+            return jsonify({"message": "No weather data available"}), 404
+
+        return jsonify(weather)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/")
 def index():
     return send_from_directory(app.static_folder, "index.html") # type: ignore
+
+
+
+
+DATA_FILE = 'app_data_{id}.json'
+@app.route("/api/load/<id>", methods=["GET"])
+def load_data(id):
+    """
+    Loads application state data from the local JSON file.
+    If the file doesn't exist, returns a default initial state.
+
+    This function simulates a GET request endpoint (e.g., /api/load) in a
+    Python web framework (Flask/FastAPI).
+    """
+    # Check if the data file exists
+    if os.path.exists(DATA_FILE.format(id=id)):
+        try:
+            with open(DATA_FILE.format(id=id), 'r') as f:
+                # Load the JSON content from the file
+                return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            # Handle empty or corrupted file gracefully
+            print(f"Error loading data: {e}. Starting with api default data.")
+            # Return a default structure if file is corrupt or unreadable
+            return { "data": "none"}
+    else:
+        # File does not exist, return initial state
+        print("Data file not found. Starting with default data.")
+        return {"data": "none"}
+
+@app.route("/api/save", methods=["POST"])
+def save_data():
+    """
+    Saves the current application state data to the local JSON file.
+    
+    This function simulates a POST request endpoint (e.g., /api/save) that 
+    accepts JSON data from the React frontend.
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON payload"}), 400
+        
+        activity_id = data.get("id")
+        if not activity_id:
+            return jsonify({"error": "Activity ID is missing"}), 400
+
+        # Open file in write mode ('w'), which will create it if it doesn't exist
+        with open(DATA_FILE.format(id=activity_id), 'w') as f:
+            # Use json.dump to write the Python dictionary (data) to the file,
+            # using an indent of 4 for human readability.
+            json.dump(data, f, indent=4)
+        print("Data saved successfully.")
+        return jsonify({"message": "Data saved successfully"}), 200
+    except IOError as e:
+        print(f"Error saving data: {e}")
+        return jsonify({"error": f"Error saving data: {e}"}), 500
+
+
+import glob
+
+@app.route("/api/birds", methods=["GET"])
+def get_all_birds():
+    """
+    Aggregates all bird markers from saved data files into a GeoJSON FeatureCollection.
+    """
+    features = []
+    # Use glob to find all files matching the pattern 'app_data_*.json'
+    for data_file in glob.glob("app_data_*.json"):
+        try:
+            with open(data_file, 'r') as f:
+                data = json.load(f)
+                markers = data.get("markers", [])
+                for marker in markers:
+                    # Ensure the marker has the required keys
+                    if "coordinates" in marker and "type" in marker:
+                        features.append({
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": marker["coordinates"]
+                            },
+                            "properties": {
+                                "type": marker["type"]
+                            }
+                        })
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error processing file {data_file}: {e}")
+
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+    return jsonify(feature_collection)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
