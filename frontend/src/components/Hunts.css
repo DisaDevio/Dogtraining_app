@@ -1,0 +1,49 @@
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
+}
+tr {
+  background-color: rgba(135, 140, 99, 0.8);
+}
+tr.activity-row-even {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+tr.activity-row-odd {
+  background-color: rgba(119, 123, 88, 0.8);
+}
+th {
+  background-color: rgba(119, 123, 88, 0.8);
+  padding: 12px;
+  color: white;
+  text-align: left;
+}
+td {
+  padding: 8px;
+  text-align: left;
+  color: white;
+}
+tr.activity-row-odd:hover {
+  background-color: rgba(213, 125, 58, 0.331);
+  border: 1px solid #ed9614;
+  border-color: #ed9614;
+  transform: scale(1.02);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+tr.activity-row-even:hover {
+  background-color: rgba(222, 139, 72, 0.331);
+  border: 1px solid #ed9614;
+  border-color: #ed9614;
+  transform: scale(1.02);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.activity-link {
+  color: #e2b94a;
+  text-decoration: none;
+}
