@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./ActivityDetails.css";
-import Map, { Marker, Source, Layer, useMap } from "react-map-gl/mapbox";
+import Map, { Marker, Source, Layer } from "react-map-gl/mapbox";
 import type { LineLayerSpecification, LngLat } from "react-map-gl/mapbox";
 import accessTokenData from "./accessToken.json";
 import Pin from "react-map-gl/mapbox";
