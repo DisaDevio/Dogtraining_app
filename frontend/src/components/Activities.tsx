@@ -4,7 +4,7 @@ import Hunts from "./Hunts";
 import LearningCurve from "./LearningCurve";
 import "../App.css";
 import Overview from "./Overview";
-import "../../public/hertha-figure.png";
+import "/hertha-figure.png";
 
 import Mapcomponent from "./Map";
 
@@ -69,7 +69,7 @@ const Activities = () => {
               <Link to="/jaktdagbok">Översikt</Link>
             </li>
             <li>
-              <Link to="/jaktdagbok/graphs">Diagram</Link>
+              <Link to="/jaktdagbok/graphs">Statistik</Link>
             </li>
             <li>
               <Link to="/jaktdagbok/hunts">Jakttillfällen</Link>
@@ -97,7 +97,7 @@ const Activities = () => {
             }}
           >
             <img
-              src="../../public/hertha-figure.png"
+              src="/hertha-figure.png"
               alt="Hertha"
               style={{
                 scale: "0.4",
@@ -108,7 +108,7 @@ const Activities = () => {
               }}
             />
             <img
-              src="../../public/husse-figure.png"
+              src="/husse-figure.png"
               alt="Husse"
               style={{
                 scale: "0.5",
