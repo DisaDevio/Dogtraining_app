@@ -7,7 +7,6 @@ import ActivityDetails from "./components/ActivityDetails";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,7 +20,6 @@ function App() {
       } catch (error) {
         console.error("Error checking login status:", error);
       }
-      setLoading(false);
     };
 
     checkLoginStatus();
@@ -50,10 +48,6 @@ function App() {
       setError("An error occurred during login.");
     }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Router>
