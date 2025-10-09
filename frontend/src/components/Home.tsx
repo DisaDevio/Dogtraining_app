@@ -45,7 +45,7 @@ const Home = () => {
         }}
       >
         <img
-          src="/hertha.jpg"
+          src="/hertha.png"
           alt="Hertha the dog"
           style={{
             width: "220px",
