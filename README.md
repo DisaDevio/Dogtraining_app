@@ -64,3 +64,29 @@ The backend server will be running on `http://127.0.0.1:5001`.
 The frontend development server will be running on `http://127.0.0.1:5173`.
 
 4.  **Open your web browser** and navigate to `http://127.0.0.1:5173` to see the application.
+
+## Build Locally Executable App for macOS
+
+To create a locally executable application for macOS, you can use `electron-packager`.
+
+1.  **Install `electron-packager`:**
+
+    ```bash
+    npm install --save-dev electron-packager
+    ```
+
+2.  **Add the following script to your `package.json` file:**
+
+    ```json
+    "scripts": {
+      "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds"
+    }
+    ```
+
+3.  **Run the script to build the app:**
+
+    ```bash
+    npm run package-mac
+    ```
+
+    This will create a `release-builds` directory with the packaged application.
