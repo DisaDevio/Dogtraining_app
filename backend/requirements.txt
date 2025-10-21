@@ -1,2 +1,4 @@
 garminconnect
 Flask
+flask-cors
+pyinstaller
