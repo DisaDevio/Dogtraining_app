@@ -1,25 +1,17 @@
 #!/usr/bin/env python3
-"""
-Simple Garmin Connect API Example
-"""
-
 import logging
 import os
 import json
-import sys
-from datetime import date
-from getpass import getpass
+
 from pathlib import Path
 
-import requests
 from flask import Flask, jsonify, send_from_directory, request
-from garth.exc import GarthException, GarthHTTPError
+from garth.exc import GarthHTTPError
 
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
     GarminConnectConnectionError,
-    GarminConnectTooManyRequestsError,
 )
 
 app = Flask(__name__, static_folder="../frontend/dist")
