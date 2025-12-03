@@ -10,31 +10,20 @@ import Mapcomponent from "./Map";
 
 const Activities = () => {
   return (
-    <div
-      className="image-container"
-      style={{
-        marginTop: "20px",
-        width: "700px",
-        border: "1px solid #ccc",
-        borderRadius: "40px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        backgroundColor: "#f9f9f9",
-        position: "relative",
-        height: "700px",
-        display: "flex",
-      }}
-    >
+    <div className="image-container">
       <img
         className="img"
         src="/background.png"
         alt="Hertha running"
         style={{
           position: "absolute",
-          width: "100%",
-          height: "100%",
+          width: "100vw",
+          height: "100vh",
           objectFit: "cover",
           borderRadius: "10px",
           zIndex: 0,
+          top: 0,
+          left: 0,
         }}
       />
 
@@ -44,6 +33,7 @@ const Activities = () => {
           zIndex: 1,
           display: "flex",
           width: "100%",
+          height: "calc(100vh - 40px)",
           backgroundColor: "rgba(87, 91, 58, 0.9)",
           borderRadius: "20px",
           margin: "20px",
@@ -92,7 +82,6 @@ const Activities = () => {
               justifyContent: "flex-start",
               alignItems: "center",
               marginLeft: "-100px",
-
               zIndex: 1,
             }}
           >
@@ -125,7 +114,6 @@ const Activities = () => {
             flexGrow: 1,
             padding: "10px",
             zIndex: 4,
-
             overflow: "auto",
           }}
         >
