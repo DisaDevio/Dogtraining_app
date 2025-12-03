@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch("/api/check_login");
+        const response = await fetch("http://127.0.0.1:5001/api/check_login");
         const data = await response.json();
         setLoggedIn(data.logged_in);
       } catch (error) {
@@ -30,7 +30,7 @@ function App() {
     setError("");
 
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("http://127.0.0.1:5001/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,15 +51,31 @@ function App() {
 
   return (
     <Router>
-      <div>
-        {loggedIn ? (
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/jaktdagbok/*" element={<Activities />} />
-            <Route path="/map" element={<MapComponent />} />
-            <Route path="/activity/:id" element={<ActivityDetails />} />
-          </Routes>
-        ) : (
+      {loggedIn ? (
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/jaktdagbok/*" element={<Activities />} />
+          <Route path="/map" element={<MapComponent />} />
+          <Route path="/activity/:id" element={<ActivityDetails />} />
+        </Routes>
+      ) : (
+        <div className="image-container">
+          <img
+            className="img"
+            src="/background.png"
+            alt="Hertha running"
+            style={{
+              position: "absolute",
+              width: "100vw",
+              height: "100vh",
+              objectFit: "cover",
+              borderRadius: "10px",
+              zIndex: 0,
+              top: 0,
+              left: 0,
+            }}
+          />
+
           <div className="login-container">
             <form onSubmit={handleLogin} className="login-form">
               <h2>Login to Garmin Connect</h2>
@@ -85,8 +101,8 @@ function App() {
               <button type="submit">Login</button>
             </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </Router>
   );
 }
