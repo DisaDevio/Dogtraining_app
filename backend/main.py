@@ -16,6 +16,10 @@ from garminconnect import (
 
 app = Flask(__name__, static_folder="../frontend/dist")
 
+#Allow CORS for local development
+from flask_cors import CORS
+CORS(app)
+
 # Suppress garminconnect library logging to avoid tracebacks in normal operation
 logging.getLogger("garminconnect").setLevel(logging.CRITICAL)
 
