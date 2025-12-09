@@ -17,41 +17,6 @@ interface SavedLearningCurveItem {
 
 const LearningCurve: React.FC = () => {
   const initialItems: LearningCurveItem[] = [
-    // {
-    //   id: 1,
-    //   text: "Social träning",
-    //   when: "2",
-    //   inProgress: false,
-    //   completed: false,
-    // },
-    // {
-    //   id: 2,
-    //   text: "Nej/ja kommando",
-    //   when: "2.5",
-    //   inProgress: false,
-    //   completed: false,
-    // },
-    // {
-    //   id: 3,
-    //   text: "Koppelvana",
-    //   when: "2.5",
-    //   inProgress: false,
-    //   completed: false,
-    // },
-    // {
-    //   id: 4,
-    //   text: "Kravlös Inkallning",
-    //   when: "2.5",
-    //   inProgress: false,
-    //   completed: false,
-    // },
-    // {
-    //   id: 5,
-    //   text: "Kravlöst stannakommando",
-    //   when: "2.5",
-    //   inProgress: false,
-    //   completed: false,
-    // },
     {
       id: 6,
       text: "Avancekommando",
@@ -111,7 +76,7 @@ const LearningCurve: React.FC = () => {
     {
       id: 14,
       text: "Stanna kvar inom rimliga avstånd",
-      when: "5",
+      when: "5.5",
       inProgress: false,
       completed: false,
     },
@@ -161,30 +126,27 @@ const LearningCurve: React.FC = () => {
 
   const [items, setItems] = useState<LearningCurveItem[]>(initialItems);
 
-  const API_URL = "http://localhost:8000"; // Backend URL
+  const API_URL = "/api"; // Backend URL
 
   // Load saved states on component mount
   useEffect(() => {
     const loadLearningCurve = async () => {
       try {
-        const response = await fetch(`${API_URL}/load-learning-curve`);
+        const response = await fetch(`${API_URL}/load/progress`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const savedItems: SavedLearningCurveItem[] = await response.json();
+        console.log("Loaded saved items:", savedItems);
+        const updatedItems = initialItems.map((initialItem) => {
+          const savedItem = savedItems.find(
+            (item) => item.id === initialItem.id
+          );
+          console.log("Matching item:", initialItem.id, savedItem);
+          return savedItem ? { ...initialItem, ...savedItem } : initialItem;
+        });
 
-        setItems((prevItems) =>
-          prevItems.map((item) => {
-            const savedItem = savedItems.find((sItem) => sItem.id === item.id);
-            return savedItem
-              ? {
-                  ...item,
-                  inProgress: savedItem.inProgress,
-                  completed: savedItem.completed,
-                }
-              : item;
-          })
-        );
+        setItems(updatedItems);
       } catch (error) {
         console.error("Failed to load learning curve data:", error);
       }
@@ -194,62 +156,57 @@ const LearningCurve: React.FC = () => {
   }, []); // Empty dependency array means this runs once on mount
 
   // Save states whenever 'items' changes
-  useEffect(() => {
-    const saveLearningCurve = async () => {
-      try {
-        const itemsToSave: SavedLearningCurveItem[] = items.map(
-          ({ id, inProgress, completed }) => ({ id, inProgress, completed })
-        );
+  const saveLearningCurve = async (updatedItems: LearningCurveItem[]) => {
+    try {
+      const itemsToSave: SavedLearningCurveItem[] = updatedItems.map(
+        ({ id, inProgress, completed }) => ({ id, inProgress, completed })
+      );
 
-        const response = await fetch(`${API_URL}/save-learning-curve`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(itemsToSave),
-        });
+      const response = await fetch(`${API_URL}/save/progress`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(itemsToSave),
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        console.log("Learning curve data saved successfully.");
-      } catch (error) {
-        console.error("Failed to save learning curve data:", error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-
-    // Only save if items have been initialized (i.e., not the initial empty state)
-    // and if there are actual items to save.
-    if (items.length > 0) {
-      saveLearningCurve();
+      console.log("Learning curve data saved successfully.");
+    } catch (error) {
+      console.error("Failed to save learning curve data:", error);
     }
-  }, [items]); // Rerun when 'items' state changes
+  };
 
   const handleCheckboxChange = (
     id: number,
     type: "inProgress" | "completed"
   ) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [type]: !item[type],
-              // Ensure only one checkbox can be true at a time for a given item
-              ...(type === "inProgress" && item.completed
-                ? { completed: false }
-                : {}),
-              ...(type === "completed" && item.inProgress
-                ? { inProgress: false }
-                : {}),
-            }
-          : item
-      )
+    const updatedItems = items.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            [type]: !item[type],
+            // Ensure only one checkbox can be true at a time for a given item
+            ...(type === "inProgress" && item.completed
+              ? { completed: false }
+              : {}),
+            ...(type === "completed" && item.inProgress
+              ? { inProgress: false }
+              : {}),
+          }
+        : item
     );
+    setItems(updatedItems);
+    saveLearningCurve(updatedItems);
   };
 
   return (
-    <div className="learning-curve-container" style={{ position: "relative" }}>
+    <div
+      className="learning-curve-container"
+      style={{ position: "relative", overflow: "hidden" }}
+    >
       <img
         src="/hertha-husse-2.png"
         alt="Background"
