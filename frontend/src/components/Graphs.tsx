@@ -49,17 +49,65 @@ const Graphs = () => {
   const [huntDetails, setHuntDetails] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/activities")
-      .then((response) => response.json())
-      .then((data) => {
-        setActivities(data);
-        const promises = data.map((activity: Activity) =>
-          fetch(`/api/load/${activity.activityId}`).then((response) =>
-            response.json()
-          )
-        );
-        Promise.all(promises).then((details) => setHuntDetails(details));
-      });
+    const abortController = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/activities", { 
+          signal: abortController.signal 
+        });
+        const result = await response.json();
+        const data = result.activities || result; // Handle both old and new API format
+        
+        if (!abortController.signal.aborted) {
+          setActivities(data);
+          
+          // Limit concurrent requests to prevent memory issues
+          const batchSize = 5;
+          const details = [];
+          
+          for (let i = 0; i < data.length; i += batchSize) {
+            if (abortController.signal.aborted) break;
+            
+            const batch = data.slice(i, i + batchSize);
+            const batchPromises = batch.map((activity: Activity) =>
+              fetch(`/api/load/${activity.activityId}`, { 
+                signal: abortController.signal 
+              }).then((response) => response.json())
+                .catch((error) => {
+                  if (error.name !== 'AbortError') {
+                    console.warn(`Failed to load details for activity ${activity.activityId}:`, error);
+                  }
+                  return null;
+                })
+            );
+            
+            const batchDetails = await Promise.all(batchPromises);
+            details.push(...batchDetails.filter(detail => detail !== null));
+            
+            // Small delay to prevent overwhelming the server
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          
+          if (!abortController.signal.aborted) {
+            setHuntDetails(details);
+          }
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Error fetching activities:', error);
+        }
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      abortController.abort();
+      setActivities([]);
+      setHuntDetails([]);
+    };
   }, []);
 
   const weeklyData = activities.reduce((acc, activity) => {
@@ -135,7 +183,7 @@ const Graphs = () => {
   };
 
   return (
-    <div>
+    <div style={{ height: "100%", overflowY: "auto", paddingBottom: "20px" }}>
       <h2 style={{ color: "white", marginBottom: "20px" }}>Statistik</h2>
       <div
         style={{
