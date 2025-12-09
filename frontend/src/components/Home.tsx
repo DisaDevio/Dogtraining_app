@@ -2,21 +2,7 @@ import "../App.css";
 
 const Home = () => {
   return (
-    <div
-      className="image-container"
-      style={{
-        marginTop: "20px",
-        width: "700px",
-        border: "1px solid #ccc",
-        borderRadius: "40px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        backgroundColor: "#f9f9f9",
-        // Position relative is essential for absolute children
-        position: "relative",
-        // Set a fixed height for the container to have a reference for positioning
-        height: "700px", // Adjust as needed
-      }}
-    >
+    <div className="image-container">
       <img
         className="img"
         src="/background.png"
@@ -27,6 +13,8 @@ const Home = () => {
           objectFit: "cover",
           borderRadius: "10px", // Add rounded corners to the image
           zIndex: 0,
+          top: 0,
+          left: 0,
         }}
       />
       <div
