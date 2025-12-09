@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./ActivityDetails.css";
 import Map, { Marker, Source, Layer } from "react-map-gl/mapbox";
-import type { LineLayerSpecification, LngLat } from "react-map-gl/mapbox";
+import type { LineLayerSpecification, LngLat, MapRef } from "react-map-gl/mapbox";
 import accessTokenData from "./accessToken.json";
 import Pin from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -47,30 +47,61 @@ const ActivityDetails = () => {
   const [wind, setWind] = useState("");
   const [markers, setMarkers] = useState<any[]>([]);
   const accessToken = accessTokenData.accessToken;
+  const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
-    fetch(`/api/activity/${id}/stats`)
-      .then((response) => response.json())
-      .then((data) => {
-        setActivity(data);
-        // Process stats data if needed
-      });
-    fetch(`/api/activity/${id}/route`)
-      .then((response) => response.json())
-      .then((data) => {
-        setLine(data);
-      });
+    const abortController = new AbortController();
+    
+    const fetchData = async () => {
+      try {
+        // Fetch all data concurrently but with abort signals
+        const [statsResponse, routeResponse, loadResponse] = await Promise.all([
+          fetch(`/api/activity/${id}/stats`, { signal: abortController.signal }),
+          fetch(`/api/activity/${id}/route`, { signal: abortController.signal }),
+          fetch(`/api/load/${id}`, { signal: abortController.signal })
+        ]);
 
-    fetch(`/api/load/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
-          setHowItWent(data.howItWent || "");
-          setWind(data.wind || "");
-          setMarkers(data.markers || []);
+        if (!abortController.signal.aborted) {
+          const [statsData, routeData, loadData] = await Promise.all([
+            statsResponse.json(),
+            routeResponse.json(),
+            loadResponse.json()
+          ]);
+
+          setActivity(statsData);
+          setLine(routeData.route || routeData); // Handle both old and new API format
+          
+          if (loadData && loadData.data !== "none") {
+            setHowItWent(loadData.howItWent || "");
+            setWind(loadData.wind || "");
+            setMarkers(loadData.markers || []);
+          }
         }
-      });
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Error fetching activity data:', error);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      abortController.abort();
+    };
   }, [id]);
+
+  // Cleanup map on unmount
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        const map = mapRef.current.getMap();
+        if (map && map.remove) {
+          map.remove();
+        }
+      }
+    };
+  }, []);
 
   const Linespec: LineLayerSpecification = {
     id: "line-layer",
@@ -129,14 +160,6 @@ const ActivityDetails = () => {
     <div
       className="image-container"
       style={{
-        marginTop: "20px",
-        width: "700px",
-        border: "1px solid #ccc",
-        borderRadius: "40px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        backgroundColor: "#f9f9f9",
-        position: "relative",
-        height: "700px",
         display: "flex",
       }}
     >
@@ -251,6 +274,7 @@ const ActivityDetails = () => {
           >
             {line && (
               <Map
+                ref={mapRef}
                 mapboxAccessToken={accessToken}
                 accessToken={accessToken}
                 style={{ width: "100%", height: "400px" }}
@@ -372,7 +396,9 @@ const ActivityDetails = () => {
               marginTop: "10px",
               flexDirection: "row",
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "space-around",
+              flexWrap: "wrap",
+              flex: 1,
             }}
           >
             <button
