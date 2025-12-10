@@ -29,6 +29,8 @@ def get_activities():
     if not api:
         return jsonify({"error": "Not logged in"}), 401
     activities = api.get_activities(0, 1000)  # first 100
+    if not activities or len(activities) == 0:
+        return jsonify({"error": "No activities found"}), 404
     hunting_activities = [
         a for a in activities
         if isinstance(a, dict) and a.get("activityType", {}).get("typeKey", "").lower() in ["hunting", "running", "hiking"]
