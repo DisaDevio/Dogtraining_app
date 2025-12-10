@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
-import "./ActivityDetails.css";
+import "../../styles/ActivityDetails.css";
 import Map, { Marker, Source, Layer } from "react-map-gl/mapbox";
-import type { LineLayerSpecification, LngLat, MapRef } from "react-map-gl/mapbox";
-import accessTokenData from "./accessToken.json";
+import type {
+  LineLayerSpecification,
+  LngLat,
+  MapRef,
+} from "react-map-gl/mapbox";
+import accessTokenData from "../auth/accessToken.json";
 import Pin from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { centroid } from "@turf/turf";
@@ -13,7 +17,7 @@ import ripaIcon from "/ripa.png";
 import orreIcon from "/orre.png";
 // @ts-ignore
 import tjaderIcon from "/tjader.png";
-import { AddBird } from "./AddBird";
+import { AddBird } from "../../hooks/AddBird";
 
 type Activity = {
   Namn: string;
@@ -51,26 +55,30 @@ const ActivityDetails = () => {
 
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const fetchData = async () => {
       try {
         // Fetch all data concurrently but with abort signals
         const [statsResponse, routeResponse, loadResponse] = await Promise.all([
-          fetch(`/api/activity/${id}/stats`, { signal: abortController.signal }),
-          fetch(`/api/activity/${id}/route`, { signal: abortController.signal }),
-          fetch(`/api/load/${id}`, { signal: abortController.signal })
+          fetch(`/api/activity/${id}/stats`, {
+            signal: abortController.signal,
+          }),
+          fetch(`/api/activity/${id}/route`, {
+            signal: abortController.signal,
+          }),
+          fetch(`/api/load/${id}`, { signal: abortController.signal }),
         ]);
 
         if (!abortController.signal.aborted) {
           const [statsData, routeData, loadData] = await Promise.all([
             statsResponse.json(),
             routeResponse.json(),
-            loadResponse.json()
+            loadResponse.json(),
           ]);
 
           setActivity(statsData);
           setLine(routeData.route || routeData); // Handle both old and new API format
-          
+
           if (loadData && loadData.data !== "none") {
             setHowItWent(loadData.howItWent || "");
             setWind(loadData.wind || "");
@@ -78,8 +86,8 @@ const ActivityDetails = () => {
           }
         }
       } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error fetching activity data:', error);
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Error fetching activity data:", error);
         }
       }
     };

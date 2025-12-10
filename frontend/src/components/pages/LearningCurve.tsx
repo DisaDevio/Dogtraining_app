@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./LearningCurve.css";
+import "../../styles/LearningCurve.css";
 
 interface LearningCurveItem {
   id: number;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Hunts.css";
+import "../../styles/Hunts.css";
 
 interface Activity {
   activityId: number;
@@ -18,21 +18,21 @@ const Hunts = () => {
 
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const fetchActivities = async () => {
       try {
         const response = await fetch("/api/activities", {
-          signal: abortController.signal
+          signal: abortController.signal,
         });
         const result = await response.json();
         const data = result.activities || result; // Handle both old and new API format
-        
+
         if (!abortController.signal.aborted) {
           setActivities(data);
         }
       } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error fetching activities:', error);
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Error fetching activities:", error);
         }
       }
     };

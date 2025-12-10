@@ -6,7 +6,6 @@ interface Activity {
 }
 
 const Overview = () => {
-  console.log("Rendering Overview component");
   const [summary, setSummary] = useState({
     total_activities: 0,
     total_distance: 0,
@@ -15,15 +14,15 @@ const Overview = () => {
 
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const fetchOverview = async () => {
       try {
         const response = await fetch("/api/activities", {
-          signal: abortController.signal
+          signal: abortController.signal,
         });
         const result = await response.json();
         const data: Activity[] = result.activities || result; // Handle both old and new API format
-        
+
         if (!abortController.signal.aborted) {
           const total_activities = data.length;
           const total_distance =
@@ -38,8 +37,8 @@ const Overview = () => {
           });
         }
       } catch (error) {
-        if (error instanceof Error && error.name !== 'AbortError') {
-          console.error('Error fetching overview data:', error);
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Error fetching overview data:", error);
         }
       }
     };
