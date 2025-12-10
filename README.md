@@ -59,6 +59,14 @@ The frontend development server will be running on `http://127.0.0.1:5173`.
 
 4.  **Open your web browser** and navigate to `http://127.0.0.1:5173` to see the application.
 
+## Run app locally
+
+To run the app locally use
+
+```bash
+npm run electron-start
+```
+
 ## Build Locally Executable App for macOS
 
 To create a locally executable application for macOS, you can use `electron-packager`.
