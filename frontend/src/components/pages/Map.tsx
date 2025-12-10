@@ -3,7 +3,7 @@ import Map, { Marker } from "react-map-gl/mapbox";
 import Pin from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "../styles/App.css";
-import accessTokenData from "./auth/accessToken.json";
+import accessTokenData from "../auth/accessToken.json";
 
 // @ts-ignore
 import ripaIcon from "/ripa.png";
