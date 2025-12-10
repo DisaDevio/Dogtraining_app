@@ -1,17 +1,11 @@
 # Garmin Activity Logger
 
-This application allows you to connect to your Garmin account and view your activities of a certain type.
+This application allows you to connect to your Garmin account using password and username and view your hunting activities, including running and hiking.
+The app will track the progress of dog training, allow the user to input data about the hunt and provides an overview of birds and hunts.
 
 ## Prerequisites
 
-- **Node.js:** This project requires Node.js version `20.19.0` or higher. We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to manage your Node.js versions.
-
-  To install or switch to the required version using nvm, run the following commands:
-
-  ```bash
-  nvm install 20
-  nvm use 20
-  ```
+- **Node.js:** This project requires Node.js version `20.11.0` or higher.
 
 - **Garmin Connect credentials:** To be able to view details about your activities, a garmin connect account is required.
 
@@ -86,7 +80,7 @@ To create a locally executable application for macOS, you can use `electron-pack
 3.  **Run the script to build the app:**
 
     ```bash
-    npm run package-mac
+    npm run package
     ```
 
     This will create a `release-builds` directory with the packaged application.

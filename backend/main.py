@@ -25,6 +25,23 @@ logging.getLogger("garminconnect").setLevel(logging.CRITICAL)
 def index():
     return send_from_directory(app.static_folder, "index.html") # type: ignore
 
+@app.route("/<path:filename>")
+def static_files(filename):
+    """Serve static files or fallback to index.html for SPA routing"""
+    import os
+    file_path = os.path.join(app.static_folder, filename) # type: ignore
+    
+    # If it's an actual file (CSS, JS, images), serve it
+    if os.path.isfile(file_path):
+        return send_from_directory(app.static_folder, filename) # type: ignore
+    
+    # If it's not a file and doesn't start with /api/, serve index.html for SPA routing
+    if not filename.startswith('api/'):
+        return send_from_directory(app.static_folder, "index.html") # type: ignore
+    
+    # For API routes that don't exist, let Flask handle the 404
+    return "API endpoint not found", 404
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
