@@ -5,11 +5,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "../../styles/App.css";
 import accessTokenData from "../auth/accessToken.json";
 
-// @ts-ignore
 import ripaIcon from "/ripa.png";
-// @ts-ignore
 import orreIcon from "/orre.png";
-// @ts-ignore
 import tjaderIcon from "/tjader.png";
 
 const MAPBOX_TOKEN = accessTokenData.accessToken;
