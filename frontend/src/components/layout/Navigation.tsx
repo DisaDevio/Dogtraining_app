@@ -1,6 +1,25 @@
 import { Link } from "react-router-dom";
 
 const Navigation = () => {
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5001/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // Redirect to home or login page after successful logout
+        window.location.href = "/";
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
   return (
     <div
       style={{
@@ -32,6 +51,22 @@ const Navigation = () => {
         </li>
         <li style={{ marginBottom: "20px", zIndex: 3 }}>
           <Link to="/jaktdagbok/map">Viltkarta</Link>
+        </li>
+        <li>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "none",
+              border: "none",
+              color: "inherit",
+              cursor: "pointer",
+              fontSize: "inherit",
+              fontFamily: "inherit",
+              padding: 0,
+            }}
+          >
+            Logga ut
+          </button>
         </li>
       </ul>
       <div

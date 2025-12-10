@@ -53,3 +53,24 @@ def check_login():
         return jsonify({"logged_in": True})
     else:
         return jsonify({"logged_in": False})
+
+@auth_bp.route("/api/logout", methods=["POST"])
+def logout():
+    """Logout by clearing stored authentication tokens."""
+    try:
+        tokenstore = os.getenv("GARMINTOKENS", "~/.garminconnect")
+        tokenstore_path = Path(tokenstore).expanduser()
+        
+        # Handle both file and directory cases
+        if tokenstore_path.exists():
+            if tokenstore_path.is_file():
+                tokenstore_path.unlink()
+            elif tokenstore_path.is_dir():
+                # Remove all files in the token directory
+                import shutil
+                shutil.rmtree(tokenstore_path)
+            return jsonify({"message": "Logout successful"})
+        else:
+            return jsonify({"message": "Already logged out"})
+    except Exception as e:
+        return jsonify({"error": f"Failed to logout: {str(e)}"}), 500
